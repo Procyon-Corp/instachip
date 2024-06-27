@@ -109,7 +109,6 @@ if [[ -n $pacman ]]; then
     pkgconf
     mold
     sqlite
-    jq
   )
   $maysudo "$pacman" -S --needed --noconfirm "${deps[@]}"
   exit 0

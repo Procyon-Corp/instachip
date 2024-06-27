@@ -52,13 +52,4 @@ impl Assets {
 
         cx.text_system().add_fonts(embedded_fonts)
     }
-
-    pub fn load_test_fonts(&self, cx: &AppContext) {
-        cx.text_system()
-            .add_fonts(vec![self
-                .load("fonts/plex-mono/ZedPlexMono-Regular.ttf")
-                .unwrap()
-                .unwrap()])
-            .unwrap()
-    }
 }

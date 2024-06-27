@@ -3201,7 +3201,13 @@ impl<'a> WindowContext<'a> {
             } else if event.modifiers.number_of_modifiers() == 1 {
                 self.window.pending_modifiers = Some(event.modifiers);
             }
-        } else if let Some(key_down_event) = event.downcast_ref::<KeyDownEvent>() {
+            if keystroke.is_none() {
+                self.finish_dispatch_key_event(event, dispatch_path);
+                return;
+            }
+        }
+
+        if let Some(key_down_event) = event.downcast_ref::<KeyDownEvent>() {
             self.window.pending_modifiers.take();
             let KeymatchResult {
                 bindings: key_down_bindings,
@@ -3216,11 +3222,6 @@ impl<'a> WindowContext<'a> {
 
             bindings = key_down_bindings;
             pending = key_down_pending;
-        }
-
-        if keystroke.is_none() {
-            self.finish_dispatch_key_event(event, dispatch_path);
-            return;
         }
 
         if pending {

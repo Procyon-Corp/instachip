@@ -213,12 +213,7 @@ impl LspAdapter for JsonLspAdapter {
     }
 
     fn language_ids(&self) -> HashMap<String, String> {
-        [
-            ("JSON".into(), "json".into()),
-            ("JSONC".into(), "jsonc".into()),
-        ]
-        .into_iter()
-        .collect()
+        [("JSON".into(), "jsonc".into())].into_iter().collect()
     }
 }
 
@@ -353,7 +348,7 @@ impl LspAdapter for NodeVersionAdapter {
         }
 
         Ok(LanguageServerBinary {
-            path: destination_path,
+            path: destination_path.join("package-version-server"),
             env: None,
             arguments: Default::default(),
         })

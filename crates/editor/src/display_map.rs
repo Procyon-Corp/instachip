@@ -720,7 +720,8 @@ impl DisplaySnapshot {
             if let Some(severity) = chunk.diagnostic_severity {
                 // Omit underlines for HINT/INFO diagnostics on 'unnecessary' code.
                 if severity <= DiagnosticSeverity::WARNING || !chunk.is_unnecessary {
-                    let diagnostic_color = super::diagnostic_style(severity, &editor_style.status);
+                    let diagnostic_color =
+                        super::diagnostic_style(severity, true, &editor_style.status);
                     diagnostic_highlight.underline = Some(UnderlineStyle {
                         color: Some(diagnostic_color),
                         thickness: 1.0.into(),
@@ -956,18 +957,16 @@ impl DisplaySnapshot {
             return false;
         }
 
-        (buffer_row.0 + 1..=max_row.0)
-            .find_map(|next_row| {
-                let next_line_indent = self.line_indent_for_buffer_row(MultiBufferRow(next_row));
-                if next_line_indent.raw_len() > line_indent.raw_len() {
-                    Some(true)
-                } else if !next_line_indent.is_line_blank() {
-                    Some(false)
-                } else {
-                    None
-                }
-            })
-            .unwrap_or(false)
+        for next_row in (buffer_row.0 + 1)..=max_row.0 {
+            let next_line_indent = self.line_indent_for_buffer_row(MultiBufferRow(next_row));
+            if next_line_indent.raw_len() > line_indent.raw_len() {
+                return true;
+            } else if !next_line_indent.is_line_blank() {
+                break;
+            }
+        }
+
+        false
     }
 
     pub fn foldable_range(

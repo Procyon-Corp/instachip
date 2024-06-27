@@ -64,7 +64,7 @@ impl TextSystem {
             fallback_font_stack: smallvec![
                 // TODO: This is currently Zed-specific.
                 // We should allow GPUI users to provide their own fallback font stack.
-                font("Zed Plex Mono"),
+                font("Zed Mono"),
                 font("Helvetica"),
                 font("Cantarell"), // Gnome
                 font("Ubuntu"),    // Gnome (Ubuntu)

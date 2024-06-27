@@ -42,12 +42,7 @@ use workspace::Workspace;
 
 actions!(
     prompt_library,
-    [
-        NewPrompt,
-        DeletePrompt,
-        DuplicatePrompt,
-        ToggleDefaultPrompt
-    ]
+    [NewPrompt, DeletePrompt, ToggleDefaultPrompt]
 );
 
 /// Init starts loading the PromptStore in the background and assigns
@@ -416,12 +411,6 @@ impl PromptLibrary {
         }
     }
 
-    pub fn duplicate_active_prompt(&mut self, cx: &mut ViewContext<Self>) {
-        if let Some(active_prompt_id) = self.active_prompt_id {
-            self.duplicate_prompt(active_prompt_id, cx);
-        }
-    }
-
     pub fn toggle_default_for_active_prompt(&mut self, cx: &mut ViewContext<Self>) {
         if let Some(active_prompt_id) = self.active_prompt_id {
             self.toggle_default_for_prompt(active_prompt_id, cx);
@@ -570,25 +559,6 @@ impl PromptLibrary {
                     })?;
                 }
                 anyhow::Ok(())
-            })
-            .detach_and_log_err(cx);
-        }
-    }
-
-    pub fn duplicate_prompt(&mut self, prompt_id: PromptId, cx: &mut ViewContext<Self>) {
-        if let Some(prompt) = self.prompt_editors.get(&prompt_id) {
-            let new_id = PromptId::new();
-            let title = prompt.title_editor.read(cx).text(cx);
-            let body = prompt.body_editor.read(cx).text(cx);
-            let save = self
-                .store
-                .save(new_id, Some(title.into()), false, body.into());
-            self.picker.update(cx, |picker, cx| picker.refresh(cx));
-            cx.spawn(|this, mut cx| async move {
-                save.await?;
-                this.update(&mut cx, |prompt_library, cx| {
-                    prompt_library.load_prompt(new_id, true, cx)
-                })
             })
             .detach_and_log_err(cx);
         }
@@ -927,28 +897,24 @@ impl PromptLibrary {
                                                         cx.dispatch_action(Box::new(DeletePrompt));
                                                     }),
                                                 )
-                                                .child(
-                                                    IconButton::new(
-                                                        "duplicate-prompt",
-                                                        IconName::BookCopy,
-                                                    )
-                                                    .size(ButtonSize::Large)
-                                                    .style(ButtonStyle::Transparent)
-                                                    .shape(IconButtonShape::Square)
-                                                    .size(ButtonSize::Large)
-                                                    .tooltip(move |cx| {
-                                                        Tooltip::for_action(
-                                                            "Duplicate Prompt",
-                                                            &DuplicatePrompt,
-                                                            cx,
-                                                        )
-                                                    })
-                                                    .on_click(|_, cx| {
-                                                        cx.dispatch_action(Box::new(
-                                                            DuplicatePrompt,
-                                                        ));
-                                                    }),
-                                                )
+                                                // .child(
+                                                //     IconButton::new(
+                                                //         "duplicate-prompt",
+                                                //         IconName::BookCopy,
+                                                //     )
+                                                //     .size(ButtonSize::Large)
+                                                //     .style(ButtonStyle::Transparent)
+                                                //     .shape(IconButtonShape::Square)
+                                                //     .size(ButtonSize::Large)
+                                                //     .tooltip(move |cx| {
+                                                //         Tooltip::for_action(
+                                                //             "Duplicate Prompt",
+                                                //             &gpui::NoAction,
+                                                //             cx,
+                                                //         )
+                                                //     })
+                                                //     .disabled(true),
+                                                // )
                                                 .child(
                                                     IconButton::new(
                                                         "toggle-default-prompt",
@@ -1007,7 +973,6 @@ impl Render for PromptLibrary {
             .key_context("PromptLibrary")
             .on_action(cx.listener(|this, &NewPrompt, cx| this.new_prompt(cx)))
             .on_action(cx.listener(|this, &DeletePrompt, cx| this.delete_active_prompt(cx)))
-            .on_action(cx.listener(|this, &DuplicatePrompt, cx| this.duplicate_active_prompt(cx)))
             .on_action(cx.listener(|this, &ToggleDefaultPrompt, cx| {
                 this.toggle_default_for_active_prompt(cx)
             }))
