@@ -38,7 +38,6 @@ pub fn init(
     languages.register_native_grammars([
         ("bash", tree_sitter_bash::language()),
         ("c", tree_sitter_c::language()),
-        ("cpp", tree_sitter_cpp::language()),
         ("css", tree_sitter_css::language()),
         ("go", tree_sitter_go::language()),
         ("gomod", tree_sitter_gomod::language()),
@@ -102,7 +101,6 @@ pub fn init(
     }
     language!("bash", Vec::new(), bash_task_context());
     language!("c", vec![Arc::new(c::CLspAdapter) as Arc<dyn LspAdapter>]);
-    language!("cpp", vec![Arc::new(c::CLspAdapter)]);
     language!(
         "css",
         vec![Arc::new(css::CssLspAdapter::new(node_runtime.clone())),]
