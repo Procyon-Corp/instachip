@@ -1,0 +1,15 @@
+id = "verilog"
+name = "SystemVerilog"
+version = "0.0.1"
+schema_version = 1
+authors = ["Sathvik Redrouthu <sathvikr@getinstachip.com>"]
+description = "SystemVerilog extension"
+repository = "https://github.com/Procyon-Corp/instachip"
+
+[grammars.verilog]
+repository = "https://github.com/tree-sitter/tree-sitter-verilog"
+commit = "075ebfc84543675f12e79a955f79d717772dcef3"
+
+[language_servers.verilog]
+name = "svls"
+language = "Verilog"
